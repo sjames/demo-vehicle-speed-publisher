@@ -1,4 +1,4 @@
-use std::{sync::Arc, thread};
+use std::{fmt::Write, sync::Arc, thread};
 
 use cyclonedds_rs::*;
 use rand::prelude::*;
@@ -13,19 +13,20 @@ use cyclonedds_sys::{*};
 fn main() {
     println!("Publishing vehicle speed every 10ms");
     
-    let participant = DdsParticipant::create(None, None, None).unwrap();
+    let participant =   ParticipantBuilder::new().create().expect("Unable to create participant");
     
+    let publisher = PublisherBuilder::new().create(&participant).expect("Unable to create publisher");
 
+    let speed_topic = TopicBuilder::<Speed>::new().create(&participant).expect("Unable to create topic");
+   
+    // Synchronous writer
+    let mut speed_writer = WriterBuilder::new().create(&publisher, speed_topic).expect("Unable to create write");
     
-    let publisher =
-        DdsPublisher::create(&participant, None, None).expect("Unable to create publisher");
+    let window_position = TopicBuilder::<Position>::new().create(&participant).expect("Unable to create topic");
 
-    let topic = Speed::create_topic(&participant, None, None, None).unwrap();
-    let mut writer = DdsWriter::create(&publisher, topic, None, None).unwrap();
+    let mut window_position_writer = 
+        WriterBuilder::new().create(&participant, window_position).expect("Unable to create window position writer");
 
-    let window_position = Position::create_topic(&participant, None, None, None).unwrap();
-    let mut window_position_writer =
-        DdsWriter::create(&publisher, window_position, None, None).unwrap();
 
     let delay = std::time::Duration::from_millis(200);
 
@@ -38,7 +39,7 @@ fn main() {
         y -= 0.5;
 
         let speed = Arc::new(Speed::new(KilometrePerHour(speed + y), None).unwrap());
-         if let Err(e) = writer.write(speed) {
+         if let Err(e) = speed_writer.write(speed) {
              println!("write failed:{}",e);
          }
 
