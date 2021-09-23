@@ -8,7 +8,7 @@ use vehicle_signals::{
     v2::vehicle::Speed,
 };
 
-use cyclonedds_sys::{*};
+//use cyclonedds_sys::{*};
 
 fn main() {
     println!("Publishing vehicle speed every 10ms");
@@ -43,6 +43,8 @@ fn main() {
              println!("write failed:{}",e);
          }
 
+        // The row and side of each position are actually keys. Each different row and side will result in a separate sample 
+        //stream.
         let pos = Position::new(Percent(25), None, 0, vehicle_signals::v2::Side::Left).unwrap();
         if let Err(e) = window_position_writer.write(Arc::new(pos)) {
             println!("write failed:{}", e);
