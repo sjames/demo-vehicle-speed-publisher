@@ -4,8 +4,8 @@ use cyclonedds_rs::*;
 use rand::prelude::*;
 use vehicle_signals::{
     units::{KilometrePerHour, Percent},
-    v2::vehicle::cabin::door::window::Position,
-    v2::vehicle::Speed,
+    v3::vehicle::cabin::door::window::Position,
+    v3::vehicle::Speed,
 };
 
 //use cyclonedds_sys::{*};
@@ -28,7 +28,7 @@ fn main() {
         WriterBuilder::new().create(&participant, window_position).expect("Unable to create window position writer");
 
 
-    let delay = std::time::Duration::from_millis(200);
+    let delay = std::time::Duration::from_millis(10);
 
     let speed: f32 = 60.0f32;
     let mut rng = rand::thread_rng();
@@ -45,22 +45,22 @@ fn main() {
 
         // The row and side of each position are actually keys. Each different row and side will result in a separate sample 
         //stream.
-        let pos = Position::new(Percent(25), None, 0, vehicle_signals::v2::Side::Left).unwrap();
+        let pos = Position::new(Percent(25), None, 0, vehicle_signals::v3::Side::Left).unwrap();
         if let Err(e) = window_position_writer.write(Arc::new(pos)) {
             println!("write failed:{}", e);
         }
 
-        let pos = Position::new(Percent(35), None, 0, vehicle_signals::v2::Side::Right).unwrap();
+        let pos = Position::new(Percent(35), None, 0, vehicle_signals::v3::Side::Right).unwrap();
         if let Err(e) = window_position_writer.write(Arc::new(pos)) {
             println!("write failed:{}", e);
         }
 
-        let pos = Position::new(Percent(0), None, 1, vehicle_signals::v2::Side::Left).unwrap();
+        let pos = Position::new(Percent(0), None, 1, vehicle_signals::v3::Side::Left).unwrap();
         if let Err(e) = window_position_writer.write(Arc::new(pos)) {
             println!("write failed:{}", e);
         }
 
-        let pos = Position::new(Percent(100), None, 1, vehicle_signals::v2::Side::Right).unwrap();
+        let pos = Position::new(Percent(100), None, 1, vehicle_signals::v3::Side::Right).unwrap();
         if let Err(e) = window_position_writer.write(Arc::new(pos)) {
             println!("write failed:{}", e);
         }
